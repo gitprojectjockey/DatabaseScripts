@@ -1,0 +1,2 @@
+Create Unique NonClustered Index UIX_tblEmployee_FirstName_LastName
+On tblEmployee(FirstName, LastName)

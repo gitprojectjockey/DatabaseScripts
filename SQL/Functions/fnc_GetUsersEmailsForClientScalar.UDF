@@ -1,0 +1,45 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_GetUsersEmailsForClientScalar]    Script Date: 8/19/2014 3:19:52 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_GetUsersEmailsForClientScalar]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_GetUsersEmailsForClientScalar]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_GetUsersEmailsForClientScalar]    Script Date: 8/19/2014 3:19:52 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_GetUsersEmailsForClientScalar]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'--select dbo.[fnc_GetUsersEmailsForClientScalar](13957,''A'')
+CREATE FUNCTION [dbo].[fnc_GetUsersEmailsForClientScalar]
+(
+	@ClientId int, 
+	@DetailLevel varchar(2)= ''A''
+)
+RETURNS 
+	varchar(max)
+AS
+BEGIN
+	DECLARE @Emails varchar(max)='''';
+
+	select @Emails=
+		stuff(
+				(
+					select '';'' + Email  
+					from 
+					(
+						SELECT distinct Email FROM dbo.fnc_GetUsersForClient(@ClientId,@DetailLevel) WHERE LTRIM(RTRIM(EMail))<>'''' 
+					) t
+					order by Email 
+					for xml path('''') 
+				),1,1,''''
+			)
+	RETURN @Emails
+END' 
+END
+
+GO
+
+

@@ -1,0 +1,9 @@
+IF NOT EXISTS(SELECT * FROM sys.columns 
+        WHERE [name] = N'Tags' AND [object_id] = OBJECT_ID(N'CWI_SupportingDocument'))
+BEGIN
+ALTER TABLE [dbo].[CWI_SupportingDocument]
+ALTER COLUMN DocCategoryId INT NULL
+
+ALTER TABLE [dbo].[CWI_SupportingDocument]
+ADD Tags VARCHAR(MAX) NULL
+END

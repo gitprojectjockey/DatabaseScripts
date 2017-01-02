@@ -1,0 +1,55 @@
+/****** Object:  Table [dbo].[CWI_History_ClientTeamRelationship]    Script Date: 6/19/2013 2:41:36 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[CWI_History_ClientTeamRelationship](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[TeamRelationshipId] [int] NOT NULL,
+	[ClientId] [int] NOT NULL,
+	[EntityLookupId] [int] NOT NULL,
+	[UserId] [int] NOT NULL,
+	[RelationshipCreatedDate] [datetime] NOT NULL,
+	[RelationshipActivateDate] [datetime] NOT NULL,
+	[RelationshipInactivateDate] [datetime] NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[CreatedBy] [int] NOT NULL,
+	[ModifiedOn] [datetime] NOT NULL,
+	[ModifiedBy] [int] NOT NULL,
+ CONSTRAINT [PK_CWI_History_ClientTeamRelationship] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[CWI_History_ClientTeamRelationship]  WITH CHECK ADD  CONSTRAINT [FK_CWI_History_ClientTeamRelationship_CWI_Client] FOREIGN KEY([ClientId])
+REFERENCES [dbo].[CWI_Client] ([ID])
+GO
+
+ALTER TABLE [dbo].[CWI_History_ClientTeamRelationship] CHECK CONSTRAINT [FK_CWI_History_ClientTeamRelationship_CWI_Client]
+GO
+
+ALTER TABLE [dbo].[CWI_History_ClientTeamRelationship]  WITH CHECK ADD  CONSTRAINT [FK_CWI_History_ClientTeamRelationship_CWI_User] FOREIGN KEY([UserId])
+REFERENCES [dbo].[CWI_User] ([Id])
+GO
+
+ALTER TABLE [dbo].[CWI_History_ClientTeamRelationship] CHECK CONSTRAINT [FK_CWI_History_ClientTeamRelationship_CWI_User]
+GO
+
+ALTER TABLE [dbo].[CWI_History_ClientTeamRelationship]  WITH CHECK ADD  CONSTRAINT [FK_CWI_History_ClientTeamRelationship_CWI_User1] FOREIGN KEY([CreatedBy])
+REFERENCES [dbo].[CWI_User] ([Id])
+GO
+
+ALTER TABLE [dbo].[CWI_History_ClientTeamRelationship] CHECK CONSTRAINT [FK_CWI_History_ClientTeamRelationship_CWI_User1]
+GO
+
+ALTER TABLE [dbo].[CWI_History_ClientTeamRelationship]  WITH CHECK ADD  CONSTRAINT [FK_CWI_History_ClientTeamRelationship_CWI_User2] FOREIGN KEY([ModifiedBy])
+REFERENCES [dbo].[CWI_User] ([Id])
+GO
+
+ALTER TABLE [dbo].[CWI_History_ClientTeamRelationship] CHECK CONSTRAINT [FK_CWI_History_ClientTeamRelationship_CWI_User2]
+GO

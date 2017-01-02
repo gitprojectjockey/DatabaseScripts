@@ -1,0 +1,39 @@
+/****** Object:  UserDefinedFunction [dbo].[MilesToKilometers]    Script Date: 12/20/2013 5:22:50 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[MilesToKilometers]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[MilesToKilometers]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[MilesToKilometers]    Script Date: 12/20/2013 5:22:50 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[MilesToKilometers]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'
+-------------------------------------------------------------------------
+-- <copyright file="MilesToKilometers.sql" company="ZIP Code Download, LLC">
+--     Copyright (c) ZIP Code Download, LLC. All rights reserved.
+-- </copyright>
+-------------------------------------------------------------------------
+
+-- Converts miles to kilometers.
+CREATE FUNCTION [dbo].[MilesToKilometers]
+(
+       @value decimal(15,5)
+)
+RETURNS decimal(15, 5)
+AS BEGIN
+       DECLARE @const_kilometers_per_mile decimal(8, 6);
+       SELECT @const_kilometers_per_mile = 1.609344;
+       RETURN CAST((@value * @const_kilometers_per_mile) AS decimal(15, 5));
+END;
+
+' 
+END
+
+GO
+
+

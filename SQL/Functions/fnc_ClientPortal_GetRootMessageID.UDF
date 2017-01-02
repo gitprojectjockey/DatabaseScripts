@@ -1,0 +1,29 @@
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_ClientPortal_GetRootMessageID]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_ClientPortal_GetRootMessageID]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE FUNCTION [dbo].[fnc_ClientPortal_GetRootMessageID]
+(
+	@MessageID int
+)
+RETURNS int
+AS
+BEGIN
+    DECLARE @result int;
+    DECLARE @ParentID int;
+
+    SET @ParentID =(SELECT ParentMessageID FROM CWI_Message
+                    WHERE ID = @MessageID)
+
+    IF(@ParentID IS NULL)
+        SET @result = @MessageID 
+    ELSE
+        SET @result = [dbo].[fnc_ClientPortal_GetRootMessageID](@ParentID)
+
+    RETURN @result 
+END

@@ -1,0 +1,94 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetJobClassCount]    Script Date: 11/3/2014 3:31:20 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetJobClassCount]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_CWI_GetJobClassCount]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetJobClassCount]    Script Date: 11/3/2014 3:31:20 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetJobClassCount]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'-- select * from dbo.fnc_CWI_GetJobClassCount (3, null)
+
+CREATE FUNCTION [dbo].[fnc_CWI_GetJobClassCount]
+(
+	@planid int,
+	@InvoiceDate datetime = null
+)
+RETURNS @tblReturn TABLE
+	(
+		ClassificationId int,
+		JobCount int,
+		StatusJobCount varchar(max),
+		CompleteJobCount int,
+		InCompleteJobCount int
+	)
+AS
+BEGIN
+	DECLARE @tbl TABLE
+	(
+		ClassificationId int,
+		StatusId int,
+		LifeCycleName varchar(200),
+		Jobcount	int
+	)
+	/*
+	INSERT INTO @tbl
+	select ClassificationId,L.LookupName LifeCycleName, count(*) jobcount from 
+	(
+	select ClassificationId,dbo.fnc_CWI_GetIncompleteJobLifecycle(Id,ClassificationId) jobstatus
+	--, count(*) ClassJobCount 
+	from CWI_Job
+	where MarketingPlanId = @planid
+	AND (InvoiceDate = @InvoiceDate OR @InvoiceDate IS NULL)
+	) x
+	inner join Lookup L ON L.id = x.jobstatus
+	group by ClassificationId, L.LookupName
+	*/
+	
+	INSERT INTO @tbl
+	(
+		ClassificationId,
+		StatusId ,
+		LifeCycleName,
+		Jobcount
+	)
+	SELECT J.ClassificationId, J.JobStatusLookupId, LS.LookupName JobStatus, count(*) StatusJobCount
+	 FROM CWI_Job J
+		INNER JOIN Lookup LS
+		ON J.JobStatusLookupId = LS.Id
+	where MarketingPlanId = @planid
+	AND (InvoiceDate = @InvoiceDate OR @InvoiceDate IS NULL)
+	group by ClassificationId, JobStatusLookupId,LS.LookupName
+
+
+
+	INSERT INTO @tblReturn
+	SELECT p1.ClassificationId,SUM(jobcount) jobcount,
+			
+			Stuff(
+			( SELECT LifeCycleName + '':'' + cast(jobcount as varchar(100)) + '',''
+			   FROM @tbl p2
+			  WHERE p2.ClassificationId = p1.ClassificationId
+			  ORDER BY LifeCycleName
+				FOR XML  PATH(''''),type ).value(''.'', ''nvarchar(max)'') 
+				, 1, 0, '''') AS StatusJobCount,
+				SUM(CASE WHEN StatusId = 8004 /* Completed */ AND StatusId <> 8006 /* Cancelled */ THEN Jobcount ELSE 0 END) CompleteJobCount,
+			SUM(CASE WHEN StatusId <> 8004 /* Completed */ AND StatusId <> 8006 /* Cancelled */ THEN Jobcount ELSE 0 END) InCompleteJobCount
+		  FROM @tbl p1
+		  GROUP BY ClassificationId ;
+	RETURN
+END
+
+
+
+' 
+END
+
+GO
+
+

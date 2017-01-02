@@ -1,0 +1,27 @@
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE [name] = N'CardCTS' AND [object_id] = OBJECT_ID(N'SettlementComDataCCNumber'))
+BEGIN
+ALTER TABLE SettlementComDataCCNumber
+  ADD CardCTS varchar(50) NULL,
+  CardLast4 varchar(4) NULL
+End
+
+/*
+ALTER TABLE SettlementComDataCCNumber
+  ADD CardCTS varchar(50) NULL,
+      CardLast4 varchar(4) NULL
+GO
+*/
+
+/* We Cannot add this index as we may use both citibank and EFS together and the above columns will be null for Citibank.
+
+CREATE UNIQUE NONCLUSTERED INDEX 
+[NIX_CardLast4_CardCTS] 
+ON [MyAddress] 
+(   
+  [CardCTS],
+  [CardLast4]
+)ON [PRIMARY]
+GO
+
+*/

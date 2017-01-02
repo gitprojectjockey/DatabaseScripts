@@ -1,0 +1,81 @@
+/****** Object:  UserDefinedFunction [dbo].[CalculateBoundary]    Script Date: 12/20/2013 5:22:21 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CalculateBoundary]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[CalculateBoundary]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[CalculateBoundary]    Script Date: 12/20/2013 5:22:21 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CalculateBoundary]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'-------------------------------------------------------------------------
+-- <copyright file="BoundaryWizard.sql" company="ZIP Code Download, LLC">
+--     Copyright (c) ZIP Code Download, LLC. All rights reserved.
+-- </copyright>
+-------------------------------------------------------------------------
+CREATE FUNCTION [dbo].[CalculateBoundary]
+(
+       @lat decimal(18,15),
+       @lon decimal(18,15),
+       @distance decimal(18, 10),
+       @measure varchar(12)
+)
+RETURNS @Boundary TABLE
+(
+       north decimal(18, 10),
+       south decimal(18, 10),
+       east decimal(18, 10),
+       west decimal(18, 10)
+)
+AS BEGIN
+
+       DECLARE @const_earth_radius decimal(7, 3), @const_miles_per_degree decimal(5, 3);
+       SELECT @const_earth_radius = 3963.189,
+              @const_miles_per_degree = 69.172;
+       
+       -- the latitude has to be within -90 and 90; longitude has to be within -180 and 180.
+       IF @lat < -90 OR @lat > 90 OR @lon < -180 OR @lon > 180 BEGIN
+              RETURN;
+       END
+       
+       -- negative distances are impossible; invert the value         
+       IF @distance < 0 BEGIN
+              SELECT @distance = @distance * -1;
+       END
+
+       -- we need to work with miles internally
+       IF @measure = ''Kilometers'' BEGIN
+              SELECT @distance = dbo.KilometersToMiles(@distance);
+       END
+       
+       -- create a radian version of the coordinate
+       DECLARE @latRad decimal(18, 16), @lonRad decimal(18, 16);
+       SELECT @latRad = radians(@lat),
+              @lonRad = radians(@lon);
+
+       DECLARE @east decimal(18, 15);
+       SELECT @east = sin( (-1 * @distance / @const_earth_radius) + PI() / 2 );
+       SELECT @east = @east - ( sin(@latRad) * sin(@latRad) );
+       SELECT @east = @east / ( cos(@latRad) * cos(@latRad) );
+       SELECT @east = acos(@east) + @lonRad;
+       SELECT @east = degrees(@east);
+
+       INSERT
+         INTO @Boundary
+       SELECT @lat + @distance / @const_miles_per_degree AS north,
+              @lat - @distance / @const_miles_per_degree AS south,
+              @east AS east,
+              @lon - (@east - @lon) AS west;
+       RETURN;
+END;
+
+' 
+END
+
+GO
+
+

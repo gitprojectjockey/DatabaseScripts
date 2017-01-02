@@ -1,0 +1,48 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetVendorCorresDeliveryScalar]    Script Date: 9/18/2014 6:07:01 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetVendorCorresDeliveryScalar]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_CWI_GetVendorCorresDeliveryScalar]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetVendorCorresDeliveryScalar]    Script Date: 9/18/2014 6:07:01 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetVendorCorresDeliveryScalar]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'--select dbo.[fnc_CWI_GetVendorCorresDeliveryScalar](13957,''''A'''')
+CREATE FUNCTION [dbo].[fnc_CWI_GetVendorCorresDeliveryScalar]
+(
+	@VendorId int, 
+	@CorresTypeId int
+)
+RETURNS 
+	varchar(max)
+AS
+BEGIN
+	DECLARE @delivery varchar(max)='''''''';
+
+	select @delivery=
+		stuff(
+				(
+					select '','' + DeliveryMethodLookupId  
+					from 
+					(
+						SELECT distinct CAST(DeliveryMethodLookupId AS VARCHAR(10)) DeliveryMethodLookupId FROM CWI_VendorCorrespondence 
+						WHERE 
+							VendorId = @VendorId
+							AND CorrespondenceLookupId = @CorresTypeId
+							AND IsActive = 1
+					) t
+					for xml path('''') 
+				),1,1,''''
+			)
+	RETURN @delivery
+END' 
+END
+
+GO
+
+

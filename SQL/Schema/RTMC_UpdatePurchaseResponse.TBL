@@ -1,0 +1,42 @@
+-------------------------------------------------------------------------------
+-- $Log: $
+-------------------------------------------------------------------------------
+IF NOT EXISTS (SELECT * FROM sys.objects
+               WHERE object_id = OBJECT_ID(N'[dbo].[RTMC_UpdatePurchaseResponse]')
+               AND TYPE IN (N'U'))
+   BEGIN
+      CREATE TABLE [dbo].[RTMC_UpdatePurchaseResponse]
+      (
+	 [ID] [int] IDENTITY(1,1) NOT NULL
+	,[ComDataCommunicationControlID] [bigint] NULL 
+	,[SettlementID] [bigint] NULL 
+	,[TransactionID] [varchar](50) NULL
+	,[VirtualMasterCardNumber] [varchar](25) NULL
+	,[ResponseCode] [int] NULL
+	,[MessageSet] [varchar](max) NULL
+        ,[Retries] [int] NULL
+	,[CreatedBy] [varchar](100) NULL
+	,[CreatedDate] [datetime] NULL DEFAULT GetDate()
+	,CONSTRAINT [PK_RTMC_UpdatePurchaseResponse] PRIMARY KEY CLUSTERED 
+         (
+            [ID]
+         ) ON [PRIMARY]
+        ) ON [PRIMARY]
+   END
+GO
+
+GO
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_RTMC_UpdatePurchaseResponse_COMDATACommunicationControl]') AND parent_object_id = OBJECT_ID(N'[dbo].[RTMC_UpdatePurchaseResponse]'))
+ALTER TABLE [dbo].[RTMC_UpdatePurchaseResponse]  WITH CHECK ADD  CONSTRAINT [FK_RTMC_UpdatePurchaseResponse_COMDATACommunicationControl] FOREIGN KEY([ComDataCommunicationControlID])
+REFERENCES [dbo].[COMDATACommunicationControl] ([ID])
+GO
+IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_RTMC_UpdatePurchaseResponse_COMDATACommunicationControl]') AND parent_object_id = OBJECT_ID(N'[dbo].[RTMC_UpdatePurchaseResponse]'))
+ALTER TABLE [dbo].[RTMC_UpdatePurchaseResponse] CHECK CONSTRAINT [FK_RTMC_UpdatePurchaseResponse_COMDATACommunicationControl]
+GO
+
+
+/*
+ALTER TABLE [dbo].[RTMC_UpdatePurchaseResponse]  WITH CHECK ADD  CONSTRAINT [FK_RTMC_UpdatePurchaseResponse_COMDATACommunicationControl] FOREIGN KEY([ComDataCommunicationControlID])
+REFERENCES [dbo].[COMDATACommunicationControl] ([ID])
+GO
+*/

@@ -1,0 +1,64 @@
+
+
+--ALTER TABLE [dbo].[CWI_GroupActivity] DROP CONSTRAINT [FK_CWI_GroupActivity_CWI_Group]
+--GO
+
+--ALTER TABLE [dbo].[CWI_GroupActivity] DROP CONSTRAINT [FK_CWI_GroupActivity_CWI_Activity]
+--GO
+
+--ALTER TABLE [dbo].[CWI_GroupActivity] DROP CONSTRAINT [DF_CWI_GroupActivity_ModifiedOn]
+--GO
+
+--ALTER TABLE [dbo].[CWI_GroupActivity] DROP CONSTRAINT [DF_CWI_GroupActivity_CreatedOn]
+--GO
+
+/****** Object:  Table [dbo].[CWI_GroupActivity]    Script Date: 4/24/2013 9:39:16 PM ******/
+--DROP TABLE [dbo].[CWI_GroupActivity]
+--GO
+
+/****** Object:  Table [dbo].[CWI_GroupActivity]    Script Date: 4/24/2013 9:39:16 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[CWI_GroupActivity](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[GroupId] [int] NOT NULL,
+	[ActivityId] [int] NOT NULL,
+	[IsRead] [bit] NOT NULL,
+	[IsReadWrite] [bit] NOT NULL,
+	[IsDelete] [bit] NOT NULL,
+	[CreatedBy] [int] NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[ModifiedBy] [int] NOT NULL,
+	[ModifiedOn] [datetime] NOT NULL,
+ CONSTRAINT [PK_CWI_GroupActivity] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[CWI_GroupActivity] ADD  CONSTRAINT [DF_CWI_GroupActivity_CreatedOn]  DEFAULT (getdate()) FOR [CreatedOn]
+GO
+
+ALTER TABLE [dbo].[CWI_GroupActivity] ADD  CONSTRAINT [DF_CWI_GroupActivity_ModifiedOn]  DEFAULT (getdate()) FOR [ModifiedOn]
+GO
+
+ALTER TABLE [dbo].[CWI_GroupActivity]  WITH CHECK ADD  CONSTRAINT [FK_CWI_GroupActivity_CWI_Activity] FOREIGN KEY([ActivityId])
+REFERENCES [dbo].[CWI_Activity] ([Id])
+GO
+
+ALTER TABLE [dbo].[CWI_GroupActivity] CHECK CONSTRAINT [FK_CWI_GroupActivity_CWI_Activity]
+GO
+
+ALTER TABLE [dbo].[CWI_GroupActivity]  WITH CHECK ADD  CONSTRAINT [FK_CWI_GroupActivity_CWI_Group] FOREIGN KEY([GroupId])
+REFERENCES [dbo].[CWI_Group] ([Id])
+GO
+
+ALTER TABLE [dbo].[CWI_GroupActivity] CHECK CONSTRAINT [FK_CWI_GroupActivity_CWI_Group]
+GO
+

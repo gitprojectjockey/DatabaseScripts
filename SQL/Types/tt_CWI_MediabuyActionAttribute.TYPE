@@ -1,0 +1,40 @@
+/****** Object:  UserDefinedTableType [dbo].[tt_CWI_MediabuyActionAttribute]    Script Date: 5/13/2014 10:09:13 PM ******/
+IF  EXISTS (SELECT * FROM sys.types st JOIN sys.schemas ss ON st.schema_id = ss.schema_id WHERE st.name = N'tt_CWI_MediabuyActionAttribute' AND ss.name = N'dbo')
+DROP TYPE [dbo].[tt_CWI_MediabuyActionAttribute]
+GO
+
+/****** Object:  UserDefinedTableType [dbo].[tt_CWI_MediabuyActionAttribute]    Script Date: 5/13/2014 10:09:13 PM ******/
+IF NOT EXISTS (SELECT * FROM sys.types st JOIN sys.schemas ss ON st.schema_id = ss.schema_id WHERE st.name = N'tt_CWI_MediabuyActionAttribute' AND ss.name = N'dbo')
+CREATE TYPE [dbo].[tt_CWI_MediabuyActionAttribute] AS TABLE(
+	[IsJobCancelled] [bit] NULL,
+	[IsQuote] [bit] NULL,
+	[InvoiceId] [bigint] NULL,
+	[JobId] [bigint] NOT NULL,
+	[VendorId] [int] NOT NULL,
+	[MMRPO] [bigint] NULL,
+	[StatusId] [int] NOT NULL,
+	[ExpectedCost] [decimal](18, 2) NULL,
+	[ExpectedInvoice] [decimal](18, 2) NULL,
+	[ActualCost] [decimal](18, 2) NULL,
+	[ActualInvoice] [decimal](18, 2) NULL,
+	[IsActualCostFreeze] [bit] NOT NULL,
+	[IsActualInvoiceFreeze] [bit] NOT NULL,
+	[IsComplimentary] [bit] NOT NULL,
+	[IsComplimentaryInvoice] [bit] NOT NULL,
+	[IsRemoved] [bit] NOT NULL,
+	[DNR] [bit] NOT NULL,
+	[CancelledDate] [datetime] NULL,
+	[IsCancelled] [bit] NOT NULL,
+	[CostType] [varchar](50) NULL,
+	[QuotedCost] [decimal](18, 2) NULL,
+	[QuotedDate] [datetime] NULL,
+	[QuotedBy] [int] NULL,
+	[CreatedBy] [int] NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[ModifiedBy] [int] NOT NULL,
+	[ModifiedOn] [datetime] NOT NULL,
+	[ActionComment] [varchar](max) NULL
+)
+GO
+
+

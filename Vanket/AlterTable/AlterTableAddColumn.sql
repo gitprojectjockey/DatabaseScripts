@@ -1,0 +1,2 @@
+ALTER TABLE Person
+ADD Age int NULL

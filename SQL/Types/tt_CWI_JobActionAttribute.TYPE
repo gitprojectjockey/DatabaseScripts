@@ -1,0 +1,31 @@
+/****** Object:  UserDefinedTableType [dbo].[tt_CWI_JobActionAttribute]    Script Date: 5/1/2014 9:11:31 PM ******/
+IF  EXISTS (SELECT * FROM sys.types st JOIN sys.schemas ss ON st.schema_id = ss.schema_id WHERE st.name = N'tt_CWI_JobActionAttribute' AND ss.name = N'dbo')
+DROP TYPE [dbo].[tt_CWI_JobActionAttribute]
+GO
+
+/****** Object:  UserDefinedTableType [dbo].[tt_CWI_JobActionAttribute]    Script Date: 5/1/2014 9:11:31 PM ******/
+IF NOT EXISTS (SELECT * FROM sys.types st JOIN sys.schemas ss ON st.schema_id = ss.schema_id WHERE st.name = N'tt_CWI_JobActionAttribute' AND ss.name = N'dbo')
+CREATE TYPE [dbo].[tt_CWI_JobActionAttribute] AS TABLE(
+	[IsCancelled] [bit] NULL,
+	[IsQuote] [bit] NULL,
+	[ClassificationId] [int] NULL,
+	[LifeCycleId] [int] NULL,
+	[InvoiceDate] [date] NULL,
+	[InvoiceId] [bigint] NULL,
+	[JobStatusLookupId] [int] NULL,
+	[IsChangeOrder] [bit] NULL,
+	[FirstRunDate] [varchar](50) NULL,
+	[IsMediabuyAvailable] [bit] NULL,
+	[IsInsertionOrderGenerated] [bit] NULL,
+	[InsertionStatusCount] [int] NULL,
+	[InactiveMediaBuyCount] [int] NULL,
+	[AdCopyFileName] [varchar](500) NULL,
+	[IsCreativeAdCopy] [bit] NULL,
+	[IsFinalAdCopyAssigned] [bit] NULL,
+	[IsFinalAdCopySent] [bit] NULL,
+	[SubmitChangeOrderComment] [varchar](max) NULL,
+	[InsertionOrderComment] [varchar](max) NULL
+)
+GO
+
+

@@ -1,0 +1,52 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetIncompleteJobLifecycle]    Script Date: 1/9/2014 2:38:56 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetIncompleteJobLifecycle]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_CWI_GetIncompleteJobLifecycle]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetIncompleteJobLifecycle]    Script Date: 1/9/2014 2:38:56 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetIncompleteJobLifecycle]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'/*
+select dbo.fnc_CWI_GetIncompleteJobLifecycle(2,401)
+*/
+
+CREATE FUNCTION [dbo].[fnc_CWI_GetIncompleteJobLifecycle]
+(
+	@jobid int,
+	@classid int
+)
+	RETURNS int 
+AS
+BEGIN
+	DECLARE @LifeCycleId INT
+	SET @LifeCycleId = (Select top 1
+		L.Id
+	FROM CWI_ClassificationJob_LifeCycle CL
+	INNER JOIN
+		Lookup L ON CL.LifeCycleLookUpId=L.Id AND CL.ClassLookupId = @classid
+	LEFT OUTER  JOIN CWI_ClassificationJob_LifeCycle_Status CLS
+		ON CLS.LifeCycleLookupId = L.Id
+			and CLS.JobId = @jobid
+	LEFT OUTER   JOIN 		
+		Lookup LS ON LS.Id=CLS.LifeCycleStatusLookupId 
+	WHERE 
+		ISNULL(LS.ID,0) <> 4205 -- Completed
+	ORDER BY CL.FlowOrder)
+
+	RETURN @LifeCycleId
+END
+
+
+
+' 
+END
+
+GO
+
+

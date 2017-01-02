@@ -1,0 +1,96 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetJobMediabuyRundatesScalar]    Script Date: 7/11/2014 3:24:48 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetJobMediabuyRundatesScalar]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_CWI_GetJobMediabuyRundatesScalar]
+GO
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetJobMediabuyRundatesScalar]    Script Date: 7/11/2014 3:24:48 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetJobMediabuyRundatesScalar]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'
+/*
+	SELECT  dbo.fnc_CWI_GetJobMediabuyRundatesScalar(1315, NULL)
+*/
+
+CREATE FUNCTION [dbo].[fnc_CWI_GetJobMediabuyRundatesScalar]
+(
+	@JobId bigint = NULL,
+	@MediaBuyId bigint = NULL
+)
+RETURNS 
+	varchar(max)
+AS
+BEGIN
+	DECLARE @tblRundate TABLE 
+	(
+		FieldValue varchar(max)
+
+	)
+
+
+	DECLARE @tblJMB TABLE 
+	(
+		FieldValue varchar(max)
+
+	)
+
+	INSERT INTO @tblJMB
+	SELECT 
+		TD.FieldValue 
+	FROM CWI_JobMediaBuyRundateTemplateData TD
+	INNER JOIN CWI_TaskTemplateField TTF
+		ON TTF.Id = TD.TemplateFieldId
+	INNER JOIN CWI_TaskField TF
+		ON TTF.TaskFieldId = TF.Id
+	WHERE TD.MediaBuyId = @MediaBuyId 
+	AND TF.MappingLookupId IN (20201) /* Ad Rundate */
+
+
+	IF EXISTS (SELECT TOP 1 1 FROM @tblJMB) /* If rundates available for media buy, ignore job level run dates */
+	BEGIN
+		INSERT INTO @tblRundate
+		SELECT 
+			t.FieldValue value
+		FROM @tblJMB t
+		
+		
+		
+	END
+	ELSE
+	BEGIN
+		IF @JobId IS  NULL
+		begin
+			SELECT  @JobId = JobId  FROM  CWI_JobMediaBuy 
+			Where Id = @MediaBuyId
+		end
+		INSERT INTO @tblRundate
+		SELECT 
+
+			td.FieldValue 
+		FROM CWI_JOBSUMMARYTemplateData TD
+		INNER JOIN CWI_TaskTemplateField TTF
+			ON TTF.Id = TD.TemplateFieldId
+		INNER JOIN CWI_TaskField TF
+			ON TTF.TaskFieldId = TF.Id
+		WHERE JOBID = @JobId 
+		AND TF.MappingLookupId IN (20201) /* Ad Rundate */
+	
+	END
+	
+	DECLARE @Rundates varchar(max)='''';
+	
+	SET @rundates=(select stuff((select '', '' + FieldValue  from (SELECT distinct FieldValue FROM @tblRundate) t
+	order by Convert(datetime,FieldValue) for xml path('''') ),1,1,''''));
+
+
+	RETURN @Rundates
+END
+
+
+
+' 
+END
+
+GO

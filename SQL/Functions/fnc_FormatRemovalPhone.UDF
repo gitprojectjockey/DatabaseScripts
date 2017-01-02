@@ -1,0 +1,33 @@
+IF EXISTS (SELECT * FROM sys.objects WHERE type in (N'FN', N'IF', N'TF', N'FS', N'FT') AND name = 'fnc_FormatRemovalPhone' )
+	DROP FUNCTION fnc_FormatRemovalPhone
+GO
+
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE FUNCTION [dbo].[fnc_FormatRemovalPhone]
+(
+	@phone varchar(100),
+	@MatchExpression varchar(100) = '^0-9'
+)
+RETURNS varchar(100)
+AS
+
+BEGIN
+	 SET @MatchExpression =  '%['+@MatchExpression+']%'
+	DECLARE @newphone varchar(100);
+	SET @newphone = ISNULL(@phone,'')
+	IF @phone IS NOT NULL
+	BEGIN
+		WHILE PatIndex(@MatchExpression, @newphone) > 0
+        SET @newphone = Stuff(@newphone, PatIndex(@MatchExpression, @newphone), 1, '')
+
+	END
+	
+	RETURN  @newphone
+END
+GO

@@ -1,0 +1,3 @@
+ALTER TABLE Person
+ADD CONSTRAINT DF_Person_GenderId
+DEFAULT 3 FOR Gender

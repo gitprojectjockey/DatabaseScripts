@@ -1,0 +1,76 @@
+/****** Object:  Table [dbo].[CWI_PayMethodMessage]    Script Date: 8/19/2014 2:40:23 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CWI_PayMethodMessage]') AND type in (N'U'))
+BEGIN
+CREATE TABLE [dbo].[CWI_PayMethodMessage](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[PayMethodLookupId] [int] NOT NULL,
+	[PayMsg1] [varchar](1000) NULL,
+	[PayMsg2] [varchar](1000) NULL,
+	[PayMsg3] [varchar](1000) NULL,
+	[PayMsg4] [varchar](1000) NULL,
+	[CreatedBy] [varchar](100) NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[ModifiedBy] [varchar](100) NOT NULL,
+	[ModifiedOn] [datetime] NOT NULL,
+ CONSTRAINT [PK_CWI_PayMethodMessage] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
+ CONSTRAINT [IX_CWI_PayMethodMessage] UNIQUE NONCLUSTERED 
+(
+	[PayMethodLookupId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+END
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_CWI_PayMethodMessage_CreatedBy]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[CWI_PayMethodMessage] ADD  CONSTRAINT [DF_CWI_PayMethodMessage_CreatedBy]  DEFAULT (suser_sname()) FOR [CreatedBy]
+END
+
+GO
+
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_CWI_PayMethodMessage_CreatedOn]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[CWI_PayMethodMessage] ADD  CONSTRAINT [DF_CWI_PayMethodMessage_CreatedOn]  DEFAULT (getdate()) FOR [CreatedOn]
+END
+
+GO
+
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_CWI_PayMethodMessage_CreatedBy1]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[CWI_PayMethodMessage] ADD  CONSTRAINT [DF_CWI_PayMethodMessage_CreatedBy1]  DEFAULT (suser_sname()) FOR [ModifiedBy]
+END
+
+GO
+
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_CWI_PayMethodMessage_ModifiedOn]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[CWI_PayMethodMessage] ADD  CONSTRAINT [DF_CWI_PayMethodMessage_ModifiedOn]  DEFAULT (getdate()) FOR [ModifiedOn]
+END
+
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_PayMethodMessage_Lookup]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_PayMethodMessage]'))
+ALTER TABLE [dbo].[CWI_PayMethodMessage]  WITH CHECK ADD  CONSTRAINT [FK_CWI_PayMethodMessage_Lookup] FOREIGN KEY([PayMethodLookupId])
+REFERENCES [dbo].[Lookup] ([Id])
+GO
+
+IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_PayMethodMessage_Lookup]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_PayMethodMessage]'))
+ALTER TABLE [dbo].[CWI_PayMethodMessage] CHECK CONSTRAINT [FK_CWI_PayMethodMessage_Lookup]
+GO
+
+

@@ -1,0 +1,49 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_GetMonthFirstDay]    Script Date: 2/10/2014 8:49:26 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_GetMonthFirstDay]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_GetMonthFirstDay]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_GetMonthFirstDay]    Script Date: 2/10/2014 8:49:26 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_GetMonthFirstDay]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'/*
+select dbo.fnc_GetMonthFirstDay (getdate(),default)
+*/
+CREATE FUNCTION [dbo].[fnc_GetMonthFirstDay]
+(
+	@dt datetime,
+	@WhichMonth char(1) = ''C'' --Current, P-Previous, N-Next
+)
+RETURNS datetime
+AS
+BEGIN
+	-- Declare the return variable here
+	DECLARE @dtFirst datetime
+	IF @WhichMonth = ''P''
+	begin
+		SELECT @dtFirst = DATEADD(MONTH, DATEDIFF(MONTH, 0, @dt) - 1, 0)
+	end
+	ELSE IF @WhichMonth = ''N''
+	begin
+		SELECT @dtFirst = DATEADD(MONTH, DATEDIFF(MONTH, 0, @dt) + 1, 0)
+	end
+	ELSE
+	begin
+		SELECT @dtFirst = DATEADD(MONTH, DATEDIFF(MONTH, 0, @dt), 0)
+	end
+	-- Return the result of the function
+	RETURN @dtFirst
+
+END
+' 
+END
+
+GO
+
+

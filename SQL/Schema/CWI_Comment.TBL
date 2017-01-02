@@ -1,0 +1,46 @@
+/****** Object:  Table [dbo].[CWI_Comment]    Script Date: 8/21/2014 6:04:21 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CWI_Comment]') AND type in (N'U'))
+BEGIN
+CREATE TABLE [dbo].[CWI_Comment](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[ObjectLookupId] [int] NOT NULL,
+	[ObjectId] [bigint] NOT NULL,
+	[Comment] [varchar](max) NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[CreatedBy] [int] NOT NULL,
+	[ModifiedOn] [datetime] NOT NULL,
+	[ModifiedBy] [int] NOT NULL,
+	[CreatedByName] [varchar](100) NULL,
+	[CreatedByEmail] [varchar](100) NULL,
+	[ModifiedByName] [varchar](100) NULL,
+	[ModifiedByEmail] [varchar](100) NULL,
+ CONSTRAINT [PK_CWI_Comment] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+END
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_Comment_Lookup]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_Comment]'))
+ALTER TABLE [dbo].[CWI_Comment]  WITH CHECK ADD  CONSTRAINT [FK_CWI_Comment_Lookup] FOREIGN KEY([ObjectLookupId])
+REFERENCES [dbo].[Lookup] ([Id])
+GO
+
+IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_Comment_Lookup]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_Comment]'))
+ALTER TABLE [dbo].[CWI_Comment] CHECK CONSTRAINT [FK_CWI_Comment_Lookup]
+GO
+
+

@@ -1,0 +1,52 @@
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[CWI_ImportColumnMap](
+	[ColumnMapID] [int] IDENTITY(1,1) NOT NULL,
+	[ImportColumnName] [varchar](100) NULL,
+	[ColumnID] [int] NOT NULL,
+	[CreateDate] [datetime] NOT NULL,
+	[FileID] [int] NOT NULL,
+	[Order] [int] NOT NULL CONSTRAINT [DF_CWI_ImportColumnMap_Order]  DEFAULT ((1)),
+ CONSTRAINT [PK_ImportColumnMap] PRIMARY KEY CLUSTERED 
+(
+	[ColumnMapID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+ALTER TABLE [dbo].[CWI_ImportColumnMap]  WITH CHECK ADD  CONSTRAINT [FK_CWI_ImportColumnMap_CWI_ImportColumn] FOREIGN KEY([ColumnID])
+REFERENCES [dbo].[CWI_ImportColumn] ([ColumnID])
+GO
+
+ALTER TABLE [dbo].[CWI_ImportColumnMap] CHECK CONSTRAINT [FK_CWI_ImportColumnMap_CWI_ImportColumn]
+GO
+
+ALTER TABLE [dbo].[CWI_ImportColumnMap]  WITH CHECK ADD  CONSTRAINT [FK_CWI_ImportColumnMap_CWI_ImportFile] FOREIGN KEY([FileID])
+REFERENCES [dbo].[CWI_ImportFile] ([FileID])
+GO
+
+ALTER TABLE [dbo].[CWI_ImportColumnMap] CHECK CONSTRAINT [FK_CWI_ImportColumnMap_CWI_ImportFile]
+GO
+
+ALTER TABLE [dbo].[CWI_ImportColumnMap]  WITH NOCHECK ADD  CONSTRAINT [CONSTRAINT [FK_CWI_ImportColumnMap_CWI_ImportColumn]] FOREIGN KEY ([ColumnID]]) REFERENCES [dbo]].[CWI_ImportColumn] CHECK  (((1)=(1)))
+GO
+
+ALTER TABLE [dbo].[CWI_ImportColumnMap] CHECK CONSTRAINT [CONSTRAINT [FK_CWI_ImportColumnMap_CWI_ImportColumn]] FOREIGN KEY ([ColumnID]]) REFERENCES [dbo]].[CWI_ImportColumn]
+GO
+
+ALTER TABLE [dbo].[CWI_ImportColumnMap]  WITH NOCHECK ADD  CONSTRAINT [CONSTRAINT [FK_CWI_ImportColumnMap_CWI_ImportFile]] FOREIGN KEY ([FileID]]) REFERENCES [dbo]].[CWI_ImportFile] CHECK  (((1)=(1)))
+GO
+
+ALTER TABLE [dbo].[CWI_ImportColumnMap] CHECK CONSTRAINT [CONSTRAINT [FK_CWI_ImportColumnMap_CWI_ImportFile]] FOREIGN KEY ([FileID]]) REFERENCES [dbo]].[CWI_ImportFile]
+GO

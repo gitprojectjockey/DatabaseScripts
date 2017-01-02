@@ -1,0 +1,36 @@
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[CWI_Integration_DigitalLeads](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Agency] [varchar](50) NOT NULL,
+	[DateRange] [varchar](50) NOT NULL,
+	[ReportName] [varchar](150) NOT NULL,
+	[AccountName] [varchar](255) NOT NULL,
+	[ApplyNowLeads] [int] NULL,
+	[FormLeads] [int] NULL,
+	[VRPreQualifiedLeads] [int] NULL,
+	[VRNotQualifiedLeads] [int] NULL,
+	[CallCount] [int] NULL,
+	[CreatedBy] [int] NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[ModifiedBy] [int] NULL,
+	[ModifiedOn] [datetime] NULL,
+ CONSTRAINT [PK_CWI_Integration_DigitalLeads] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+

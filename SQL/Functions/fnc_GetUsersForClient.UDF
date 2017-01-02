@@ -1,0 +1,72 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_GetUsersForClient]    Script Date: 8/19/2014 3:20:44 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_GetUsersForClient]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_GetUsersForClient]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_GetUsersForClient]    Script Date: 8/19/2014 3:20:44 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_GetUsersForClient]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'CREATE FUNCTION [dbo].[fnc_GetUsersForClient](@ClientId int, @DetailLevel varchar(2)= ''A'')
+	RETURNS @tblUser TABLE (UserId int,
+	UserName varchar(2000),
+	Email varchar(200))
+AS
+BEGIN
+
+	DECLARE @dt DATETIME
+	SELECT @dt = CONVERT (DATE, GETDATE(),101)  	 
+
+	DECLARE @tbl TABLE
+	(
+		UserId int
+	)
+
+	IF @DetailLevel IN (''A''/*All*/,''D''/*Division*/)
+	BEGIN
+		INSERT INTO @tbl
+		select  CTR.UserId from [CWI_ClientTeamRelationship] CTR
+		WHERE 	CTR.ClientId = @clientId
+		AND
+		( 
+		(@dt between CONVERT(DATE,CTR.RelationshipActivateDate,101) AND ISNULL(CTR.RelationshipInActivateDate,convert(date,GETDATE(),101)))
+		OR 
+		( CONVERT(DATE,CTR.RelationshipActivateDate,101)>= @dt AND CTR.RelationshipInActivateDate IS NULL)
+
+		)
+	END
+
+	IF @DetailLevel IN (''A''/*All*/,''C''/*Client*/)
+	BEGIN
+
+		DECLARE @parentId int
+		SELECT @parentId = ParentId FROM CWI_Client WHERE Id = @clientId
+
+		INSERT INTO @tbl
+		select  CTR.UserId from [CWI_ClientTeamRelationship] CTR
+		WHERE 	CTR.ClientId = @parentId
+		AND
+		( 
+		(@dt between CONVERT(DATE,CTR.RelationshipActivateDate,101) AND ISNULL(CTR.RelationshipInActivateDate,convert(date,GETDATE(),101)))
+		OR 
+		( CONVERT(DATE,CTR.RelationshipActivateDate,101)>= @dt AND CTR.RelationshipInActivateDate IS NULL)
+
+		)
+	END
+
+	INSERT INTO @tblUser
+	SELECT U.Id, U.Names, U.Email FROM @tbl t
+	INNER JOIN CWI_User U
+		ON t.UserId = U.id and U.IsActive = 1
+	RETURN
+END' 
+END
+
+GO
+
+

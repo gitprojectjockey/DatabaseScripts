@@ -1,0 +1,45 @@
+
+
+--ALTER TABLE [dbo].[CWI_ErrorLog] DROP CONSTRAINT [DF_CWI_ErrorLog_CreatedOn]
+--GO
+
+/****** Object:  Table [dbo].[CWI_ErrorLog]    Script Date: 4/24/2013 9:38:45 PM ******/
+--DROP TABLE [dbo].[CWI_ErrorLog]
+--GO
+
+/****** Object:  Table [dbo].[CWI_ErrorLog]    Script Date: 4/24/2013 9:38:45 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[CWI_ErrorLog](
+	[ErrorID] [int] IDENTITY(1,1) NOT NULL,
+	[SpName] [varchar](50) NOT NULL,
+	[ErrorCode] [int] NOT NULL,
+	[ErrorMessage] [varchar](max) NULL,
+	[ErrorSeverity] [varchar](255) NULL,
+	[ErrorState] [varchar](255) NULL,
+	[ErrorLine] [int] NULL,
+	[UserName] [varchar](50) NULL,
+	[ExtendedErrorCode] [int] NULL,
+	[ExtendedErrorText] [varchar](255) NULL,
+	[CreatedOn] [datetime] NOT NULL,
+ CONSTRAINT [PK_CWI_ErrorLog] PRIMARY KEY CLUSTERED 
+(
+	[ErrorID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+ALTER TABLE [dbo].[CWI_ErrorLog] ADD  CONSTRAINT [DF_CWI_ErrorLog_CreatedOn]  DEFAULT (getdate()) FOR [CreatedOn]
+GO
+

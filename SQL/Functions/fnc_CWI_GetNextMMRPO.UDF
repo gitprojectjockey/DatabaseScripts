@@ -1,0 +1,27 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetNextMMRPO]    Script Date: 1/27/2014 7:45:02 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetNextMMRPO]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_CWI_GetNextMMRPO]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetNextMMRPO]    Script Date: 1/27/2014 7:45:02 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetNextMMRPO]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'CREATE FUNCTION [dbo].[fnc_CWI_GetNextMMRPO]()
+returns int	
+AS
+BEGIN
+	DECLARE @mmrpo bigint
+	SELECT @mmrpo =  MAX(ISNULL([MMRPO],0))+1  FROM [CWI_JobMediaBuy] 
+	return (@mmrpo)
+END' 
+END
+
+GO
+
+

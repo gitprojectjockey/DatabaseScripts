@@ -1,0 +1,52 @@
+
+/****** Object:  Table [dbo].[CWI_Integration_Facebook]    Script Date: 8/26/2014 9:49:11 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[CWI_Integration_Facebook](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ClientName] [varchar](500) NOT NULL,
+	[ProductName] [varchar](500) NOT NULL,
+	[Date] [datetime] NOT NULL,
+	[Impressions] [int] NOT NULL,
+	[Clicks] [decimal](17, 2) NOT NULL,
+	[Spend] [money] NOT NULL,
+	[PageLike] [int] NOT NULL,
+	[PageLike28d] [int] NOT NULL,
+	[PageLike1d] [int] NOT NULL,
+	[CostPerPageLike] [money] NOT NULL,
+	[ClickToPageLike] [decimal](17, 2) NOT NULL,
+	[PostLike] [decimal](17, 2) NOT NULL,
+	[PostLike28d] [int] NOT NULL,
+	[PostLike1d] [int] NOT NULL,
+	[CostPerPostLike] [money] NOT NULL,
+	[ClickToPostLike] [decimal](17, 2) NOT NULL,
+	[LeadConversion] [decimal](17, 2) NOT NULL,
+	[Visits] [int] NOT NULL,
+	[Leads] [int] NOT NULL,
+	[Calls] [int] NOT NULL,
+	[LeadConversion28dPostClick] [int] NOT NULL,
+	[LeadConversion1dPostImpression] [int] NOT NULL,
+	[CostPerLeadConversion] [money] NOT NULL,
+	[ClicktoLeadConversionPercent] [decimal](17, 2) NOT NULL,
+	[LeadConversionValue] [decimal](17, 2) NOT NULL,
+	[CreatedBy] [int] NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[ModifiedBy] [int] NULL,
+	[ModifiedOn] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO

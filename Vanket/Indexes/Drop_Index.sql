@@ -1,0 +1,1 @@
+Drop Index tblEmployee.IX_tblEmployee_Salary

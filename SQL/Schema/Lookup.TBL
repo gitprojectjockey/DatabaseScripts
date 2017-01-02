@@ -1,0 +1,83 @@
+/****** Object:  Table [dbo].[Lookup]    Script Date: 3/21/2014 2:53:23 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Lookup]') AND type in (N'U'))
+BEGIN
+CREATE TABLE [dbo].[Lookup](
+	[Id] [int] NOT NULL,
+	[LookupTypeId] [int] NOT NULL,
+	[LookupName] [varchar](100) NOT NULL,
+	[SortOrder] [int] NOT NULL,
+	[IsActive] [bit] NOT NULL,
+	[IsSystemGenerated] [bit] NOT NULL,
+	[CreatedBy] [varchar](100) NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+ CONSTRAINT [PK_Lookup] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+END
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+SET ANSI_PADDING ON
+
+GO
+
+/****** Object:  Index [UK_Lookup]    Script Date: 3/21/2014 2:53:23 PM ******/
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[Lookup]') AND name = N'UK_Lookup')
+CREATE UNIQUE NONCLUSTERED INDEX [UK_Lookup] ON [dbo].[Lookup]
+(
+	[LookupTypeId] ASC,
+	[LookupName] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_Lookup_SortOrder]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[Lookup] ADD  CONSTRAINT [DF_Lookup_SortOrder]  DEFAULT ((0)) FOR [SortOrder]
+END
+
+GO
+
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_Lookup_IsSystemGenerated]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[Lookup] ADD  CONSTRAINT [DF_Lookup_IsSystemGenerated]  DEFAULT ((0)) FOR [IsSystemGenerated]
+END
+
+GO
+
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_Lookup_CreatedBy]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[Lookup] ADD  CONSTRAINT [DF_Lookup_CreatedBy]  DEFAULT (suser_sname()) FOR [CreatedBy]
+END
+
+GO
+
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_Lookup_CreatedOn]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[Lookup] ADD  CONSTRAINT [DF_Lookup_CreatedOn]  DEFAULT (getdate()) FOR [CreatedOn]
+END
+
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_Lookup_Lookup]') AND parent_object_id = OBJECT_ID(N'[dbo].[Lookup]'))
+ALTER TABLE [dbo].[Lookup]  WITH CHECK ADD  CONSTRAINT [FK_Lookup_Lookup] FOREIGN KEY([LookupTypeId])
+REFERENCES [dbo].[LookupType] ([Id])
+GO
+
+IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_Lookup_Lookup]') AND parent_object_id = OBJECT_ID(N'[dbo].[Lookup]'))
+ALTER TABLE [dbo].[Lookup] CHECK CONSTRAINT [FK_Lookup_Lookup]
+GO
+
+

@@ -1,0 +1,35 @@
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_ClientPortal_GetUserName]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_ClientPortal_GetUserName]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE FUNCTION [dbo].[fnc_ClientPortal_GetUserName]
+(
+	@UserID int
+       ,@IsClientUser bit
+)
+RETURNS varchar(100)
+AS
+
+BEGIN
+	DECLARE @UserName  varchar(100) = ''
+	
+	IF(@IsClientUser = 1)
+	
+	   SELECT @UserName = ISNULL(CC.Name, 'No Name') 
+	   FROM CWI_ClientContact CC
+	   INNER JOIN CWI_ClientContactPortal CCP
+	   ON CCP.Email = CC.Email
+	   WHERE CCP.ID = @USerID
+	   
+	ElSE
+	    SELECT @UserName = ISNULL(U.Login,'No Name')
+	    FROM CWI_User U
+	    WHERE U.ID = @UserID
+	 
+	RETURN  @UserName
+END

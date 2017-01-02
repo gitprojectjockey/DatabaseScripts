@@ -1,0 +1,9 @@
+BEGIN
+  INSERT INTO RICOWNER.RIC_TXTYPE (TXTYPE, CREATEDDATE, CREATEDBY,DESCRIPTION, MODIFIEDBY, MODIFIEDDATE) 
+  VALUES ( 12, SYSDATE, 'SystemLoad', 'TripPak Express Imaging (TEIS)', NULL, NULL);
+EXCEPTION
+  WHEN dup_val_on_index
+  THEN
+    NULL; -- Intentionally ignore duplicates
+END;
+/

@@ -1,0 +1,110 @@
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_GetClientsForUser]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_GetClientsForUser]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_GetClientsForUser]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'
+--select * from dbo.fnc_GetClientsForUser(7, ''C'')
+CREATE FUNCTION [dbo].[fnc_GetClientsForUser](@UserId int, @DetailLevel varchar(2)= ''A'')
+	RETURNS @tblClients TABLE (ClientId int,
+	ClientCode varchar(2000),
+	ClientName varchar(2000),
+	ParentId int )
+AS
+BEGIN
+
+
+	DECLARE @dt DATETIME
+	SELECT @dt = CONVERT (DATE, GETDATE(),101)  	 
+
+	DECLARE @tbl TABLE
+	(
+		ClientId int,
+		ClientCode varchar(2000),
+		ClientName varchar(2000),
+		ParentId int
+	)
+
+		
+	--DECLARE @tbl  tt_CWI_UserClient
+	--DECLARE @tblD tt_CWI_UserClient
+
+	;WITH ClientCTE(ClientId, ClientCode, ClientName, ParentID)
+	AS
+	( 
+		select  ClientId, ClientCode, ClientName, ParentID from [CWI_ClientTeamRelationship] CTR
+		INNER JOIN CWI_Client C ON CTR.ClientId = C.ID 
+		WHERE 	CTR.UserId = @UserId
+			AND
+			( 
+			(@dt between CONVERT(DATE,CTR.RelationshipActivateDate,101) AND ISNULL(CTR.RelationshipInActivateDate,convert(date,GETDATE(),101)))
+			OR 
+			( CONVERT(DATE,CTR.RelationshipActivateDate,101)>= @dt AND CTR.RelationshipInActivateDate IS NULL)
+
+			)
+		UNION ALL
+		 SELECT  P.Id, P.ClientCode, P.ClientName, P.ParentID
+		 FROM CWI_Client AS P
+		  JOIN ClientCTE AS M
+		   ON P.ID = M.ParentID
+ 
+	)
+
+	INSERT INTO @tbl
+	(
+		ClientId ,
+	ClientCode ,
+	ClientName ,
+	ParentId
+	)
+	SELECT distinct
+		ClientId, ClientCode,
+		ClientName,
+		ParentID
+	FROM ClientCTE
+	WHERE ParentID IS NULL
+
+	
+
+	IF @DetailLevel = ''D'' -- Division
+	begin
+		
+		INSERT INTO @tblClients
+		SELECT * FROM @tbl
+		UNION ALL
+		select C.Id, C.ClientCode, C.ClientName, C.ParentID from @tbl t
+		INNER JOIN  CWI_Client C ON t.ClientId = C.ParentId  
+		
+		
+	end
+	ELSE IF @DetailLevel = ''C'' -- Client
+	begin
+		INSERT INTO @tblClients
+		SELECT * FROM  @tbl
+	end
+	ELSE --Client and Division
+	begin
+		INSERT INTO @tblClients
+		SELECT * FROM @tbl
+		UNION ALL
+		select C.Id, C.ClientCode, C.ClientName, C.ParentID from @tbl t
+		INNER JOIN  CWI_Client C ON t.ClientId = C.ParentId  
+		
+	end
+	RETURN
+END
+
+
+' 
+END
+
+GO
+
+

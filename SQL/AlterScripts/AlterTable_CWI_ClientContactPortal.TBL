@@ -1,0 +1,26 @@
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE [name] = N'CurrentLoginDate' AND [object_id] = OBJECT_ID(N'CWI_ClientContactPortal'))
+BEGIN
+
+ALTER TABLE [dbo].[CWI_ClientContactPortal]
+ADD CurrentLoginDate datetime NULL
+
+END
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE [name] = N'ClientModifiedBy' AND [object_id] = OBJECT_ID(N'CWI_ClientContactPortal'))
+BEGIN
+
+ALTER TABLE [dbo].[CWI_ClientContactPortal]
+ADD ClientModifiedBy [int] NULL
+
+ALTER TABLE [dbo].[CWI_ClientContactPortal]  WITH CHECK ADD  CONSTRAINT [FK_CWI_ClientContactPortal_CWI_ClientContactPortal] FOREIGN KEY([ClientModifiedBy])
+REFERENCES [dbo].[CWI_ClientContactPortal] ([Id])
+
+END
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE [name] = N'ClientModifiedOn' AND [object_id] = OBJECT_ID(N'CWI_ClientContactPortal'))
+BEGIN
+
+ALTER TABLE [dbo].[CWI_ClientContactPortal]
+ADD ClientModifiedOn [datetime] NULL
+
+END

@@ -1,0 +1,42 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_GetMaxDateTime]    Script Date: 4/8/2014 11:48:43 AM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_GetMaxDateTime]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_GetMaxDateTime]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_GetMaxDateTime]    Script Date: 4/8/2014 11:48:43 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_GetMaxDateTime]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'-- =============================================
+-- Author:		Mohankumar
+-- Create date: 08 APR14
+-- Description:	<Description, ,>
+-- =============================================
+CREATE FUNCTION [dbo].[fnc_GetMaxDateTime]
+(
+	@dt datetime
+)
+RETURNS datetime
+AS
+BEGIN
+	-- Declare the return variable here
+	DECLARE @dtRet datetime
+
+	-- Add the T-SQL statements to compute the return value here
+	SELECT @dtRet = DATEADD(millisecond,-3,DATEADD(day,1,@dt))
+
+	-- Return the result of the function
+	RETURN @dtRet
+
+END
+' 
+END
+
+GO
+
+

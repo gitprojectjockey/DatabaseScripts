@@ -1,0 +1,64 @@
+
+
+--ALTER TABLE [dbo].[CWI_GroupFeature] DROP CONSTRAINT [FK_CWI_GroupFeature_CWI_Menu]
+--GO
+
+---ALTER TABLE [dbo].[CWI_GroupFeature] DROP CONSTRAINT [FK_CWI_GroupFeature_CWI_Group]
+--GO
+
+--ALTER TABLE [dbo].[CWI_GroupFeature] DROP CONSTRAINT [DF_CWI_GroupFeature_ModifiedOn]
+--GO
+
+--ALTER TABLE [dbo].[CWI_GroupFeature] DROP CONSTRAINT [DF_CWI_GroupFeature_CreatedOn]
+--GO
+
+/****** Object:  Table [dbo].[CWI_GroupFeature]    Script Date: 4/24/2013 9:39:43 PM ******/
+--DROP TABLE [dbo].[CWI_GroupFeature]
+--GO
+
+/****** Object:  Table [dbo].[CWI_GroupFeature]    Script Date: 4/24/2013 9:39:43 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[CWI_GroupFeature](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[GroupId] [int] NOT NULL,
+	[MenuId] [int] NOT NULL,
+	[IsRead] [bit] NOT NULL,
+	[IsReadWrite] [bit] NOT NULL,
+	[IsDelete] [bit] NOT NULL,
+	[CreatedBy] [int] NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[ModifiedBy] [int] NOT NULL,
+	[ModifiedOn] [datetime] NOT NULL,
+ CONSTRAINT [PK_CWI_GroupFeature] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[CWI_GroupFeature] ADD  CONSTRAINT [DF_CWI_GroupFeature_CreatedOn]  DEFAULT (getdate()) FOR [CreatedOn]
+GO
+
+ALTER TABLE [dbo].[CWI_GroupFeature] ADD  CONSTRAINT [DF_CWI_GroupFeature_ModifiedOn]  DEFAULT (getdate()) FOR [ModifiedOn]
+GO
+
+ALTER TABLE [dbo].[CWI_GroupFeature]  WITH CHECK ADD  CONSTRAINT [FK_CWI_GroupFeature_CWI_Group] FOREIGN KEY([GroupId])
+REFERENCES [dbo].[CWI_Group] ([Id])
+GO
+
+ALTER TABLE [dbo].[CWI_GroupFeature] CHECK CONSTRAINT [FK_CWI_GroupFeature_CWI_Group]
+GO
+
+ALTER TABLE [dbo].[CWI_GroupFeature]  WITH CHECK ADD  CONSTRAINT [FK_CWI_GroupFeature_CWI_Menu] FOREIGN KEY([MenuId])
+REFERENCES [dbo].[CWI_Menu] ([Id])
+GO
+
+ALTER TABLE [dbo].[CWI_GroupFeature] CHECK CONSTRAINT [FK_CWI_GroupFeature_CWI_Menu]
+GO
+

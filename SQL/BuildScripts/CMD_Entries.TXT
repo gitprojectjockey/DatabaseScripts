@@ -1,0 +1,5 @@
+D:\AASmartSVN_Development\ACSAdvertizing\database\BuildScripts\DBR02373.bat DCVSQL2K12D01\DC1 CWEric
+D:\AASmartSVN_Development\ACSAdvertizing\database\BuildScripts\DBR02373.bat DCVSQL2K12D01\DC1 ClientWiseDev
+
+cd /d D:\AASmartSVN_Development\ACSAdvertizing\database\BuildScripts
+t.bat DCVSQL2K12D01\DC1 CWEric

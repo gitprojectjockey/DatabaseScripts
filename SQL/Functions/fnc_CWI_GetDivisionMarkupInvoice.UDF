@@ -1,0 +1,105 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetDivisionMarkupInvoice]    Script Date: 6/20/2014 8:25:00 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetDivisionMarkupInvoice]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_CWI_GetDivisionMarkupInvoice]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetDivisionMarkupInvoice]    Script Date: 6/20/2014 8:25:00 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetDivisionMarkupInvoice]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'-- =============================================
+-- Author:		Mohankumar Sundaram
+-- Create date: 17JUN14
+-- Description:	Return the calculated invoice for the cost based on Division''s markup and job''s classification
+-- select dbo.fnc_CWI_GetDivisionMarkupInvoice(1234,401,12)
+-- =============================================
+CREATE FUNCTION [dbo].[fnc_CWI_GetDivisionMarkupInvoice]
+(
+	@inDivisionID int,
+	@inClassificationId int,
+	@cost decimal(18,2)
+)
+RETURNS decimal(18,5)
+BEGIN
+	DECLARE @markup decimal(18,5)
+	DECLARE @markupPct decimal(18,5)
+	DECLARE @invoice decimal(18,5)
+	DECLARE @roundTo int
+
+
+
+	SELECT	
+		@markupPct = ISNULL( CASE WHEN ISNULL(cc.MarkupPct,-1.00) = -1.00  
+			THEN (SELECT ISNULL(MarkupPct,0) FROM CWI_Client WHERE ID = @inDivisionID)		
+			ELSE CC.MarkupPct
+			END,0) ,
+		@roundTo = COALESCE(CC.RoundToLookupID,3005)/*Standard*/  
+	FROM  CWI_ClientClassification CC
+	WHERE CC.ClientID = @inDivisionID AND CC.ClassificationLookupID=@inClassificationId	
+		
+	
+	SET @markup = ISNULL(@markupPct/100.0 ,0)
+
+
+
+	/*
+	1.  (Cost of Media * Markup) + Cost of Media = (15.52 * .1765) + 15.52 = 18.25982  
+	2. The number above should always be rounded to 4 decimals to the right.  
+	There must be a standard used otherwise you never know how many decimals to use.  
+	In this case that would round the number to 18.2598.  
+	If the fifth decimal to the right is 5 or higher then it would have rounded this number to 18.2599.
+
+	*/
+	SET @invoice = ROUND((@cost * @markup) + @cost, 4)
+	
+	/*
+	 Next Dollar:  This is the simplest one.  You simply round up always to the next dollar.  
+	In this case because your result was higher than $18 your Invoice amount would be $19.00
+	*/
+	if (@roundTo = 3003)    /*Next Dollar */
+	Begin
+		SET @invoice = CEILING(@invoice);
+	End
+	ELSE if (@roundTo = 3004)    /*Nearest Dollar */
+	/*
+	Nearest Dollar:  Nearest Dollar provides the same type of rounding rules, but to rounded to the appropriate digit left of the decimal.  
+	In this case your rounding from 18.2598 which is your result would please the Invoice amount at $18.00 because 
+	you
+r result would not present a 5 or higher on the first digit to the right of the decimal.  
+	In the case that this value would have been 18.5528 the result would have been $19.00 because your at or above .50 (fifty cents).  
+	Note: Rounding matters here.  
+If your result would have been 18.49 you would still end up rounding making the “4” a “5” 
+	because the next digit to the right is above “5”  (a 9).  That would extend the number to .5 or higher 
+	therefore rounding the result up to $19.00.  I hope that m
+akes sense.  Basically  the rules of rounding apply 
+	similar to those rules in the “Standard” except instead of stopping your rounding at two positions to the right of the decimal
+	 you are extending your rounding to the first digit to the left of the de
+cimal.
+	 */
+	Begin
+		select @invoice = ROUND( ROUND(@invoice ,1),0)
+	End
+	ELSE /* STANDARD */
+	/*
+	Standard:  Standard should not provide the same rounding to two digits for the invoice.  
+	In this instance it would be $18.26 because you are at 18.259 (third digit is 5 or higher therefore we round up).
+	*/
+	Begin
+		SET @invoice = ROUND(@invoice,2);
+	End
+
+	RETURN @invoice
+
+END		
+
+' 
+END
+
+GO
+
+

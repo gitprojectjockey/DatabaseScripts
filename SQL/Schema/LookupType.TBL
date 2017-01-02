@@ -1,0 +1,45 @@
+/****** Object:  Table [dbo].[LookupType]    Script Date: 3/21/2014 2:53:34 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[LookupType]') AND type in (N'U'))
+BEGIN
+CREATE TABLE [dbo].[LookupType](
+	[Id] [int] NOT NULL,
+	[LookupTypeName] [varchar](50) NOT NULL,
+	[RangeStarting] [int] NULL,
+	[RangeEnding] [int] NULL,
+	[CreatedBy] [varchar](100) NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+ CONSTRAINT [PK_LookupType] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+END
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_LookupType_CreatedBy]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[LookupType] ADD  CONSTRAINT [DF_LookupType_CreatedBy]  DEFAULT (suser_sname()) FOR [CreatedBy]
+END
+
+GO
+
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_LookupType_CreatedOn]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[LookupType] ADD  CONSTRAINT [DF_LookupType_CreatedOn]  DEFAULT (getdate()) FOR [CreatedOn]
+END
+
+GO
+
+

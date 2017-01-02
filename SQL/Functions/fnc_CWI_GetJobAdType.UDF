@@ -1,0 +1,49 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetJobAdType]    Script Date: 3/15/2014 9:48:25 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetJobAdType]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_CWI_GetJobAdType]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetJobAdType]    Script Date: 3/15/2014 9:48:25 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetJobAdType]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'
+/*
+	SELECT  dbo.fnc_CWI_GetJobAdType(1315)
+*/
+
+CREATE FUNCTION [dbo].[fnc_CWI_GetJobAdType]
+(
+	@JobId bigint
+)
+RETURNS 
+	varchar(max)
+AS
+BEGIN
+	
+	DECLARE @adtype varchar(max) = ''''
+	select  top 1 @adtype = LA.LookupName from dbo.fnc_GetJobSummaryTemplateData(@jobId)
+	INNER JOIN Lookup LA
+		ON LA.Id = (CASE WHEN ISNUMERIC(FieldValue) = 1 THEN CAST(FieldValue AS int)
+									ELSE 0 END)
+										
+	where MappingFieldId = 20208 /* Ad Type	 */
+	
+
+
+	RETURN @adtype
+END
+
+
+
+' 
+END
+
+GO
+
+

@@ -1,0 +1,6 @@
+C:\@EDevelopment\ESourceCode\SQL Server\Vanket\@SQLInjectionHack\SQLInjection\bin\SQLInjection.dll.config
+C:\@EDevelopment\ESourceCode\SQL Server\Vanket\@SQLInjectionHack\SQLInjection\bin\SQLInjection.dll
+C:\@EDevelopment\ESourceCode\SQL Server\Vanket\@SQLInjectionHack\SQLInjection\bin\SQLInjection.pdb
+C:\@EDevelopment\ESourceCode\SQL Server\Vanket\@SQLInjectionHack\SQLInjection\obj\Debug\SQLInjection.csprojResolveAssemblyReference.cache
+C:\@EDevelopment\ESourceCode\SQL Server\Vanket\@SQLInjectionHack\SQLInjection\obj\Debug\SQLInjection.dll
+C:\@EDevelopment\ESourceCode\SQL Server\Vanket\@SQLInjectionHack\SQLInjection\obj\Debug\SQLInjection.pdb

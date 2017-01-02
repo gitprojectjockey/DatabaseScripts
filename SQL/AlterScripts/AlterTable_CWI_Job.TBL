@@ -1,0 +1,19 @@
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE [name] = N'ApprovedDate' AND [object_id] = OBJECT_ID(N'CWI_Job'))
+BEGIN
+
+ALTER TABLE [dbo].[CWI_Job]
+ADD ApprovedDate datetime NULL
+
+END
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE [name] = N'ApprovedByPortalUserID' AND [object_id] = OBJECT_ID(N'CWI_Job'))
+BEGIN
+
+ALTER TABLE [dbo].[CWI_Job]
+ADD ApprovedByPortalUserID [int] NULL
+
+ALTER TABLE [dbo].[CWI_Job]  WITH CHECK ADD  CONSTRAINT [FK_CWI_Job_CWI_ClientContactPortal] FOREIGN KEY([ApprovedByPortalUserID])
+REFERENCES [dbo].[CWI_ClientContactPortal] ([Id])
+
+END
+

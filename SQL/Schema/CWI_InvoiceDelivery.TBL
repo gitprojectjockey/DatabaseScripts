@@ -1,0 +1,78 @@
+/****** Object:  Table [dbo].[CWI_InvoiceDelivery]    Script Date: 7/21/2014 4:20:05 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CWI_InvoiceDelivery]') AND type in (N'U'))
+BEGIN
+CREATE TABLE [dbo].[CWI_InvoiceDelivery](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[InvoiceId] [bigint] NOT NULL,
+	[DeliveryLookupId] [int] NOT NULL,
+	[DeliveryEmail] [varchar](max) NULL,
+	[DeliveryOn] [datetime] NULL,
+	[CreatedBy] [int] NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[ModifiedBy] [int] NOT NULL,
+	[ModifiedOn] [datetime] NOT NULL,
+	[IsDeleted] [bit] NOT NULL,
+ CONSTRAINT [PK_CWI_InvoiceDelivery] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+END
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_CWI_InvoiceDelivery_IsDeleted]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[CWI_InvoiceDelivery] ADD  CONSTRAINT [DF_CWI_InvoiceDelivery_IsDeleted]  DEFAULT ((0)) FOR [IsDeleted]
+END
+
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_InvoiceDelivery_CWI_Invoice]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_InvoiceDelivery]'))
+ALTER TABLE [dbo].[CWI_InvoiceDelivery]  WITH CHECK ADD  CONSTRAINT [FK_CWI_InvoiceDelivery_CWI_Invoice] FOREIGN KEY([InvoiceId])
+REFERENCES [dbo].[CWI_Invoice] ([Id])
+GO
+
+IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_InvoiceDelivery_CWI_Invoice]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_InvoiceDelivery]'))
+ALTER TABLE [dbo].[CWI_InvoiceDelivery] CHECK CONSTRAINT [FK_CWI_InvoiceDelivery_CWI_Invoice]
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_InvoiceDelivery_CWI_User]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_InvoiceDelivery]'))
+ALTER TABLE [dbo].[CWI_InvoiceDelivery]  WITH CHECK ADD  CONSTRAINT [FK_CWI_InvoiceDelivery_CWI_User] FOREIGN KEY([CreatedBy])
+REFERENCES [dbo].[CWI_User] ([Id])
+GO
+
+IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_InvoiceDelivery_CWI_User]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_InvoiceDelivery]'))
+ALTER TABLE [dbo].[CWI_InvoiceDelivery] CHECK CONSTRAINT [FK_CWI_InvoiceDelivery_CWI_User]
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_InvoiceDelivery_CWI_User_ModifiedBy]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_InvoiceDelivery]'))
+ALTER TABLE [dbo].[CWI_InvoiceDelivery]  WITH CHECK ADD  CONSTRAINT [FK_CWI_InvoiceDelivery_CWI_User_ModifiedBy] FOREIGN KEY([ModifiedBy])
+REFERENCES [dbo].[CWI_User] ([Id])
+GO
+
+IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_InvoiceDelivery_CWI_User_ModifiedBy]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_InvoiceDelivery]'))
+ALTER TABLE [dbo].[CWI_InvoiceDelivery] CHECK CONSTRAINT [FK_CWI_InvoiceDelivery_CWI_User_ModifiedBy]
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_InvoiceDelivery_Lookup_Delivery]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_InvoiceDelivery]'))
+ALTER TABLE [dbo].[CWI_InvoiceDelivery]  WITH CHECK ADD  CONSTRAINT [FK_CWI_InvoiceDelivery_Lookup_Delivery] FOREIGN KEY([DeliveryLookupId])
+REFERENCES [dbo].[Lookup] ([Id])
+GO
+
+IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_InvoiceDelivery_Lookup_Delivery]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_InvoiceDelivery]'))
+ALTER TABLE [dbo].[CWI_InvoiceDelivery] CHECK CONSTRAINT [FK_CWI_InvoiceDelivery_Lookup_Delivery]
+GO
+
+

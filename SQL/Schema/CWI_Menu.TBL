@@ -1,0 +1,45 @@
+/****** Object:  Table [dbo].[CWI_Menu]    Script Date: 3/21/2014 3:00:05 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CWI_Menu]') AND type in (N'U'))
+BEGIN
+CREATE TABLE [dbo].[CWI_Menu](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ApplicationId] [int] NOT NULL,
+	[MenuCaption] [varchar](100) NOT NULL,
+	[MenuLocation] [varchar](100) NOT NULL,
+	[MenuPage] [varchar](100) NOT NULL,
+	[IsActive] [bit] NOT NULL,
+	[SortOrder] [int] NOT NULL,
+	[ParentId] [int] NULL,
+	[IsHidden] [bit] NOT NULL,
+	[CreatedBy] [varchar](100) NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[ModifiedBy] [varchar](100) NOT NULL,
+	[ModifiedOn] [datetime] NOT NULL,
+ CONSTRAINT [PK_CWI_Menu] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+END
+GO
+SET ANSI_PADDING OFF
+GO
+IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_CWI_Menu_IsHidden]') AND type = 'D')
+BEGIN
+ALTER TABLE [dbo].[CWI_Menu] ADD  CONSTRAINT [DF_CWI_Menu_IsHidden]  DEFAULT ((0)) FOR [IsHidden]
+END
+
+GO
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_Menu_CWI_Menu]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_Menu]'))
+ALTER TABLE [dbo].[CWI_Menu]  WITH CHECK ADD  CONSTRAINT [FK_CWI_Menu_CWI_Menu] FOREIGN KEY([ParentId])
+REFERENCES [dbo].[CWI_Menu] ([Id])
+GO
+IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_CWI_Menu_CWI_Menu]') AND parent_object_id = OBJECT_ID(N'[dbo].[CWI_Menu]'))
+ALTER TABLE [dbo].[CWI_Menu] CHECK CONSTRAINT [FK_CWI_Menu_CWI_Menu]
+GO

@@ -1,0 +1,23 @@
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_ClientPortal_GetRecipientNames]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_ClientPortal_GetRecipientNames]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE FUNCTION [dbo].[fnc_ClientPortal_GetRecipientNames]
+(
+	@MessageID int
+)
+RETURNS varchar(max)
+AS
+
+BEGIN
+	DECLARE @recipients VARCHAR(max) 
+        SELECT @recipients = COALESCE(@recipients + ', ', '') + dbo.fnc_ClientPortal_GetUserName(RecipientUserID, RecipientIsClient) FROM CWI_MessageRecipient
+        WHERE MessageID = @MessageID
+	 
+	RETURN  @recipients
+END

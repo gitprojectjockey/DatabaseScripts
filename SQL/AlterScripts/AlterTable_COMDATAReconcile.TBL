@@ -1,0 +1,5 @@
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE [name] = N'CardCTS' AND [object_id] = OBJECT_ID(N'COMDATAReconcile'))
+BEGIN
+ALTER TABLE COMDATAReconcile
+  ADD CardCTS varchar(20) NULL
+End

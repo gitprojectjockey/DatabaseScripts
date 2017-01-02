@@ -1,0 +1,47 @@
+
+IF EXISTS (SELECT * FROM sys.objects WHERE type in (N'FN', N'IF', N'TF', N'FS', N'FT') AND name = 'fnc_utl_Split' )
+	DROP FUNCTION fnc_utl_Split
+GO
+
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_utl_Split]    Script Date: 4/25/2013 9:18:29 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE FUNCTION [dbo].[fnc_utl_Split] (
+     @String nvarchar(max)
+   , @Delimiter char(1)
+   )
+RETURNS @Results TABLE (Items nvarchar(max))
+WITH EXECUTE AS CALLER
+AS
+    BEGIN
+    DECLARE @INDEX INT
+    DECLARE @SLICE nvarchar(max)
+    -- PRIME THE LOOP
+    SELECT @INDEX = 1
+    IF @String IS NULL RETURN
+    WHILE @INDEX !=0
+        BEGIN	
+        	-- GET THE INDEX OF THE FIRST OCCURENCE OF THE SPLIT CHARACTER
+        	SELECT @INDEX = CHARINDEX(@Delimiter,@STRING)
+        	-- NOW PUSH EVERYTHING TO THE LEFT OF IT INTO THE SLICE VARIABLE
+        	IF @INDEX !=0
+        		SELECT @SLICE = RTRIM(LTRIM(LEFT(@STRING,@INDEX - 1)))
+        	ELSE
+        		SELECT @SLICE = RTRIM(LTRIM(@STRING))
+        	-- PUT THE ITEM INTO THE RESULTS SET
+        	INSERT INTO @Results(Items) VALUES(@SLICE)
+        	-- CHOP THE ITEM REMOVED OFF THE MAIN STRING
+        	SELECT @STRING = RTRIM(LTRIM(RIGHT(@STRING,LEN(@STRING) - @INDEX)))
+        	-- BREAK OUT IF WE ARE DONE
+        	IF LEN(@STRING) = 0 BREAK
+    END
+    RETURN
+END
+
+GO
+

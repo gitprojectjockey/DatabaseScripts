@@ -1,0 +1,141 @@
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetJobMediabuyRundates]    Script Date: 2/10/2014 8:49:57 PM ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetJobMediabuyRundates]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+DROP FUNCTION [dbo].[fnc_CWI_GetJobMediabuyRundates]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fnc_CWI_GetJobMediabuyRundates]    Script Date: 2/10/2014 8:49:57 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnc_CWI_GetJobMediabuyRundates]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+execute dbo.sp_executesql @statement = N'
+/*
+	SELECT * FROM fnc_CWI_GetJobMediabuyRundates(1315, NULL)
+*/
+
+CREATE FUNCTION [dbo].[fnc_CWI_GetJobMediabuyRundates]
+(
+	@JobId bigint = NULL,
+	@MediaBuyId bigint = NULL
+)
+RETURNS 
+	@tblRundate TABLE 
+	(
+		MediaBuyLookupId bigint,
+		MappingLookupId int,
+		FieldValue varchar(max)
+
+	)
+AS
+BEGIN
+	
+	IF @JobId IS  NULL
+	begin
+		SELECT  @JobId = JobId  FROM  CWI_JobMediaBuy 
+		Where Id = @MediaBuyId
+	end
+
+	DECLARE @tblRundateAll TABLE 
+	(
+		MediaBuyLookupId bigint,
+		MappingLookupId int,
+		JobFieldValue varchar(max),
+		MediaFieldValue varchar(max)
+	)
+	DECLARE @tblJobTemplate TABLE
+	(
+		MappingLookupId int,
+		FieldValue varchar(1000)
+	)
+	insert into @tblJobTemplate
+	select * from dbo.fnc_GetJobSummaryTemplateData(@jobId)
+
+
+	IF @MediaBuyId IS NOT NULL
+	BEGIN
+		INSERT INTO @tblRundate
+		SELECT
+			@MediaBuyId,
+			*
+		FROM
+		(
+		SELECT 
+			ISNULL(TF.MappingLookupId,t.MappingLookupId) MappingLookupId,
+			ISNULL(JMBT.FieldValue, t.FieldValue) value
+		FROM 
+		CWI_JobMediaBuyRundateTemplateData JMBT
+			INNER JOIN CWI_TaskTemplateField TTF
+				ON JMBT.TemplateFieldId = TTF.Id AND JMBT.MediaBuyId = @MediaBuyId
+			INNER JOIN CWI_TaskField TF
+				ON TTF.TaskFieldId = TF.Id
+				AND TF.MappingLookupId IN (20201,20202,20203,20204,20205,20206,20207)
+			FULL OUTER JOIN 
+				(SELECT * FROM @tblJobTemplate
+					WHERE  MappingLookupId IN (20201,20202,20203,20204,20205,20206,20207)  ) t
+				ON t.MappingLookupId = TF.MappingLookupId
+				) s
+			WHERE s.value IS NOT NULL
+		ORDER BY s.value 
+	END
+	ELSE
+	BEGIN
+		INSERT INTO @tblRundateAll
+		SELECT
+			*
+		FROM
+		(
+		SELECT 
+			JMBT.MediaBuyId,
+			ISNULL(TF.MappingLookupId,t.MappingLookupId) MappingLookupId,
+			t.FieldValue JobValue,
+			JMBT.FieldValue MediaBuyValue
+		FROM 
+		CWI_JobMediaBuy JMB
+		INNER JOIN CWI_JobMediaBuyRundateTemplateData JMBT
+			ON JMB.id = JMBT.MediaBuyId AND JMB.JobId = @JobId
+		INNER JOIN CWI_TaskTemplateField TTF
+			ON JMBT.TemplateFieldId = TTF.Id
+			INNER JOIN CWI_TaskField TF
+				ON TTF.TaskFieldId = TF.Id
+				AND TF.MappingLookupId IN (20201,20202,20203,20204,20205,20206,20207)
+			FULL OUTER JOIN 
+				(SELECT * FROM @tblJobTemplate
+					WHERE  MappingLookupId IN (20201,20202,20203,20204,20205,20206,20207)  ) t
+				ON t.MappingLookupId = TF.MappingLookupId
+	) s
+			
+		
+		INSERT INTO @tblRundate
+		SELECT 
+			t.MediaBuyLookupId,
+			t.MappingLookupId,
+			CASE WHEN ltrim(rtrim(ISNULL(MB.MBFieldValue,''''))) <> ''''
+				THEN t.MediaFieldValue ELSE t.JobFieldValue END
+		FROM
+			@tblRundateAll t
+			LEFT OUTER JOIN
+			(
+				SELECT MediaBuyLookupId, 
+				   Stuff((SELECT '', '' + ISNULL(MediaFieldValue ,'''')
+						  FROM   @tblRundateAll t2 
+						  WHERE  t2.MediaBuyLookupId = t1.MediaBuyLookupId 
+						  FOR XML PATH('''')), 1, 2, '''') MBFieldValue 
+				FROM   @tblRundateAll t1 
+				GROUP  BY MediaBuyLookupId
+			) MB
+			ON t.MediaBuyLookupId = MB.MediaBuyLookupId
+		 
+	END
+	
+	RETURN 
+END
+' 
+END
+
+GO
+
+

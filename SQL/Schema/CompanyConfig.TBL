@@ -1,0 +1,44 @@
+/****** Object:  Table [dbo].[CompanyConfig]    Script Date: 6/27/2013 5:42:45 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[CompanyConfig](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[CompanyName] [varchar](255) NOT NULL,
+	[AddressLine1] [varchar](255) NOT NULL,
+	[AddressLine2] [varchar](255) NULL,
+	[CountryID] [int] NOT NULL,
+	[StateID] [int] NOT NULL,
+	[City] [varchar](50) NOT NULL,
+	[Zip] [varchar](50) NOT NULL,
+	[WorkPhone] [varchar](50) NULL,
+	[WorkExtn] [varchar](10) NULL,
+	[WorkFax] [varchar](50) NULL,
+	[CreatedBy] [int] NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[ModifiedBy] [int] NOT NULL,
+	[ModifiedOn] [datetime] NOT NULL,
+ CONSTRAINT [PK_CompanyConfig] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+SET ANSI_PADDING OFF
+GO
+
+ALTER TABLE [dbo].[CompanyConfig]  WITH CHECK ADD  CONSTRAINT [FK_CompanyConfig_Country] FOREIGN KEY([CountryID])
+REFERENCES [dbo].[Country] ([ID])
+GO
+ALTER TABLE [dbo].[CompanyConfig] CHECK CONSTRAINT [FK_CompanyConfig_Country]
+GO
+ALTER TABLE [dbo].[CompanyConfig]  WITH CHECK ADD  CONSTRAINT [FK_CompanyConfig_State] FOREIGN KEY([StateID])
+REFERENCES [dbo].[State] ([ID])
+GO
+ALTER TABLE [dbo].[CompanyConfig] CHECK CONSTRAINT [FK_CompanyConfig_State]
+GO
+
